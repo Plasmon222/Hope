@@ -1,0 +1,42 @@
+var surveyTemplate={
+      "beans": [{
+                  "notesData": "输入正确的手机号",
+                  "columnTag": "1",
+                  "isSelect": "0",
+                  "boxType": "0",
+                  "boxData": "输入框",
+                  "columnName": "电话号"
+            },
+            {
+                  "notesData": "无注释",
+                  "columnTag": "2",
+                  "isSelect": "0",
+                  "boxType": "1",
+                  "boxData": "男；女；无性别",
+                  "columnName": "姓别"
+            },
+            {
+                  "notesData": "请输入年龄",
+                  "columnTag": "3",
+                  "isSelect": "1",
+                  "boxType": "0",
+                  "boxData": "输入框",
+                  "columnName": "年龄"
+            },
+            {
+                  "notesData": "请输入喜欢吃什么",
+                  "columnTag": "4",
+                  "isSelect": "1",
+                  "boxType": "2",
+                  "boxData": "牛奶；面包；可乐；土豆",
+                  "columnName": "食物"
+            }
+      ],
+      "bean": {
+            "total": 0
+      },
+      "object": null,
+      "totalCount": 0,
+      "returnMessage": "查询成功！",
+      "returnCode": "0"
+}
