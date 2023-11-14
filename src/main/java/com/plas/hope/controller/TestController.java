@@ -96,11 +96,12 @@ public class TestController {
     }
     @ResponseBody
     @RequestMapping(value="/saveSurveyTemplateData",method = RequestMethod.POST )
-    public String index2(@RequestBody Map<String, String> map) {
-        logger.info("保存请求save：");
-        for (String value : map.values()) {
-            System.out.println("Value: " + value);
-        }
+//    public String index2(@RequestBody Map<String, String> map) {
+    public String index2(@RequestBody String params) {
+        logger.info("保存请求save：params="+params);
+//        for (String value : map.values()) {
+//            System.out.println("Value: " + value);
+//        }
 //        logger.info("保存请求save："+save);
         String ccc="{    \"object\": null,\n" +
                 "    \"totalCount\": 0,\n" +

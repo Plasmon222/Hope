@@ -216,9 +216,7 @@ function getFormData() {
         // alert("验证手机号成功：" + phoneNum);
         console.log("验证手机号成功===" + phoneNum)
         // 4、发送form表单数据给新建接口
-        inputParams = "\"surveyId\":\"" + surveyId + "\",\"columnContent\":\"" + columnContent + "\",\"ColumnTag\":\"" + ColumnTag + "\",\"phoneNum\":\"" + phoneNum+"\"";
-        console.log("准备发送的数据===" + JSON.stringify({inputParams}))
-        saveData(inputParams);
+        saveData(surveyId,columnContent,ColumnTag,phoneNum);
     } else {
         alert("手机号码格式错误：" + phoneNum);
 
@@ -230,13 +228,22 @@ function submitClick(){
 }
 
 // 4、发送form表单数据给新建接口
-function saveData(inputParams) {
+function saveData(surveyId,columnContent,columnTag,phoneNum) {
+    console.log("准备发送的数据===" + JSON.stringify({"surveyId":surveyId,
+        "columnContent":columnContent,
+        "ColumnTag":columnTag,
+        "phoneNum":phoneNum}))
     $.ajax({
         url: "http://localhost:8080/saveSurveyTemplateData",
         type: "POST",
         dataType: "json",
         contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({inputParams}),
+        data: JSON.stringify({
+            "surveyId":surveyId,
+            "columnContent":columnContent,
+            "ColumnTag":columnTag,
+            "phoneNum":phoneNum
+        }),
         // data: surveyId,
         success: function (response) {
             console.log("5、数据保存成功");
