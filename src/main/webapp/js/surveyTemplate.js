@@ -1,6 +1,26 @@
+//0、获取携带入参url上的参数作为模版id
+function getUrlParams() {
+    var params = {};
+    var queryString = window.location.search.substring(1);
+    var keyValuePairs = queryString.split('&');
+
+    for (var i = 0; i < keyValuePairs.length; i++) {
+        var keyValue = keyValuePairs[i].split('=');
+        params[decodeURIComponent(keyValue[0])] = decodeURIComponent(keyValue[1] || '');
+    }
+
+    return params;
+}
+
+var urlParams = getUrlParams();
+sruveyIdValue = urlParams.surveyId;
+console.log(sruveyIdValue);
+
+
+
 console.log("1、调用ajax方法,获取数据。");
-var surveyId = "12";
-getFormat(surveyId);
+var surveyId = sruveyIdValue;
+getFormat(sruveyIdValue);
 
 //1、ajax请求url地址
 function getFormat(surveyId) {
@@ -55,9 +75,9 @@ function surveyTemplateTest(result) {
         var city = document.getElementById("city");
         // 向city中添加输入框
         if(isSelect==0){
-            city.innerHTML += "<li><p class='question'>" + columnName + "（必填）</p></li>";
+            city.innerHTML += "<li><p class='question xrequired'>" + columnName + "</p></li>";
         }else{
-            city.innerHTML += "<li><p class='question'>" + columnName + "</p></li>";
+            city.innerHTML += "<li><p class='question '>" + columnName + "</p></li>";
         }
 
 
@@ -82,7 +102,7 @@ function surveyTemplateTest(result) {
                 if(isSelect==0){
                 div.innerHTML +=
                     "<div class='inline-radio'>" +
-                        "<label>" +
+                        "<label style=\"font-size: 20px;\">" +
                             "<input type='radio' required='required' style='width: 20px' name=qs" + columnTag + " value=" + value + ">"
                                 + value +
                         "</label>" +
@@ -90,7 +110,7 @@ function surveyTemplateTest(result) {
                 }else{
                     div.innerHTML +=
                         "<div class='inline-radio'>" +
-                        "<label>" +
+                        "<label style=\"font-size: 20px;\">" +
                         "<input type='radio' style='width: 20px' name=qs" + columnTag + " value=" + value + ">"
                         + value +
                         "</label>" +
@@ -114,8 +134,8 @@ function surveyTemplateTest(result) {
             let div = document.createElement("div");
             $.each(arr, function (index, value) {
                 //向li中设置文本
-                if(isSelect==0){div.innerHTML += "<div class='inline-radio'><label><input type='checkbox' required='required' style='width: 20px' name=qs" + columnTag + " value=" + value + ">"+ value+ "</label></div>";}
-                else {div.innerHTML += "<div class='inline-radio'><label><input type='checkbox'  style='width: 20px' name=qs" + columnTag + " value=" + value + ">"+ value+ "</label></div>";}
+                if(isSelect==0){div.innerHTML += "<div class='inline-radio'><label style=\"font-size: 20px;\"><input type='checkbox' required='required' style='width: 20px' name=qs" + columnTag + " value=" + value + ">"+ value+ "</label></div>";}
+                else {div.innerHTML += "<div class='inline-radio'><label style=\"font-size: 20px;\"><input type='checkbox'  style='width: 20px' name=qs" + columnTag + " value=" + value + ">"+ value+ "</label></div>";}
                 //将li添加到city中
                 li.appendChild(div);
             })
@@ -124,9 +144,9 @@ function surveyTemplateTest(result) {
         } else {
             //required
             if(isSelect==0){
-                city.innerHTML += "<li><input type='text' required='required' name=qs" + columnTag + " placeholder=" + notesData + "></li>";
+                city.innerHTML += "<li><input class='box-out input-style'  type='text' required='required' name=qs" + columnTag + " placeholder=" + notesData + "></li>";
             }else {
-                city.innerHTML += "<li><input type='text' name=qs" + columnTag + " placeholder=" + notesData + "></li>";
+                city.innerHTML += "<li><input class='box-out input-style'  type='text' name=qs" + columnTag + " placeholder=" + notesData + "></li>";
             }
         }
     }
@@ -158,7 +178,9 @@ submitButton.addEventListener('click',function (event){
     const requiredInputs =form.querySelectorAll('[required]');
     for (const input of requiredInputs){
         if(input.value.trim() ===''){
-            alert('请填写必填项');
+            staffNo("请填写必填项");
+            // alert('请填写必填项');
+
             return;
         }
     }
@@ -213,13 +235,12 @@ function getFormData() {
     var inputs = form.getElementsByTagName("input");
     let phoneNum = inputs[0].value;
     if (isPhoneNumberValid(phoneNum)) {
-        // alert("验证手机号成功：" + phoneNum);
         console.log("验证手机号成功===" + phoneNum)
         // 4、发送form表单数据给新建接口
         saveData(surveyId,columnContent,ColumnTag,phoneNum);
     } else {
-        alert("手机号码格式错误：" + phoneNum);
-
+        // alert("手机号码格式错误：" + phoneNum);
+        staffNo("手机号码格式错误："+ phoneNum)
     }
 }
 //submitClick
@@ -248,16 +269,27 @@ function saveData(surveyId,columnContent,columnTag,phoneNum) {
         success: function (response) {
             console.log("5、数据保存成功");
             console.log(response);
-            alert("数据保存成功");
-            // if (confirm("数据保存成功")) {
-                location.reload();
-            // }
+            // alert("数据保存成功");
+            staffNo("数据保存成功")
+            window.location="index.html"
         },
         error: function (xhr, status, error) {
+            window.location="index.html"
             console.error("Error: " + error);
         }
-    });
+
+    }
+
+    );
 }
 
+//设置遮罩层
+function staffNo(msg){
+    $('#staff_no .yx_content-team').html(msg);
+    $('#staff_no,.shadow').show();
+    setTimeout(function (){
+        $('#staff_no,.shadow').hide();
+    },1500)
+}
 
 

@@ -90,14 +90,60 @@
     .question {
       font-family: verdana;
       font-size: 140%;
-      color: green;
+      color: black;
+    }
+    /*设置必填项前面星号红色*/
+    .xrequired:before {
+      content: '* ';
+      color: red;
+    }
+    /*设置输入框样式*/
+    .input-style{
+      resize: none;
+      outline: none;
+      border: none;
+      /*padding-right: 20px;*/
+      /*width: 100%;*/
+    }
+    .box-out{
+      display: block;
+      padding-right: 20px;
+      /*padding-left: 20px;*/
+      padding-bottom: 30px;
+      font-size: 20px;
+    }
+    .headH1{
+      font-size: 30px;
+      font-family: "微软雅黑" !important;
+    }
+    /*设置遮罩层相关*/
+    .yx_word-pop-team{
+      background: white;
+      width: auto;
+      position: fixed;
+      top: 38%;
+      left: 0;
+      right: 0;
+      margin: auto;
+      z-index: 99;
+      border-radius: 20px;
+      display: none;
+      border: 1px solid black;
+    }
+    .yx_content-team{
+      width: 80%;
+      margin: 60px auto 60px;
+      font-size: 30px;
+      text-align: center;
+      font-weight: bold;
+      color: #0f8fea;
     }
   </style>
   <script src="https://s3.pstatp.com/cdn/expire-1-M/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 <div class="container2">
-  <h1 id="tittle">This is Tittle</h1>
+  <h1 id="tittle" class="headH1">This is Tittle</h1>
   <form id="myForm">
     <div class="inner">
       <ul id="city">
@@ -107,6 +153,10 @@
     <button type="submit" id="submitButton" onclick="submitClick">提交</button>
   </form>
 </div>
+<div class="yx_word-pop-team" id="staff_no" style="display: none">
+  <div class="yx_content-team"></div>
+</div>
+<div class="shadow" style="display: none"></div>
 </body>
 <script type="text/javascript" src="js/surveyTemplate.js"></script>
 </html>

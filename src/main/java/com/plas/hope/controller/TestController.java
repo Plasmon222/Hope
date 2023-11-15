@@ -26,6 +26,7 @@ public class TestController {
     public String index(String surveyId) { //@PathVariable("surveyId")
         logger.info("测试请求test1：");
         logger.info("surveyId:"+surveyId);
+
         String ccc="{\n" +
                 "      \"beans\": [{\n" +
                 "                  \"notesData\": \"输入正确的手机号\",\n" +
