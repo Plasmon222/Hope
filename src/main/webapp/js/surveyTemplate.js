@@ -31,13 +31,26 @@ function getFormat(surveyId) {
         type: "POST",
         dataType: "json",
         contentType: "application/json; charset=utf-8",
-        // data: JSON.stringify({ params: "{\"surveyId\":"+surveyId+"}"}),
-        data: {
-        },
+        data: JSON.stringify({"surveyId":surveyId}),
         success: function (response) {
-            console.log("2、调用surveyTemplateTest方法，进行模版设置");
-            // console.log(response);
-            surveyTemplateTest(response);
+            //1.1 判断返回模版有效期是否有效
+            var gpTime=response.object.gpTime;
+
+            //判断的方法
+            function isTimeOver(targetTimeStr) {
+                var nowTime = new Date();
+                var targetTime = new Date(targetTimeStr);
+                return nowTime.getTime() > targetTime.getTime();
+            }
+            if (isTimeOver(gpTime)) {
+                console.log("当前时间已经超过截止时间,跳转错误页面");
+                window.location.replace("index.html");
+                // window.location ="teamTask2.html?rtnMsg="+encodeURIComponent("问卷调查已结束");
+            } else {
+                console.log("当前时间未超过截止时间");
+                console.log("2、调用surveyTemplateTest方法，进行模版设置");
+                surveyTemplateTest(response);
+            }
         },
         error: function (xhr, status, error) {
             console.error("Error: " + error);
@@ -61,14 +74,7 @@ function surveyTemplateTest(result) {
     function setTittle(Bt){
         var tittle1 = document.getElementById("tittle");
         tittle1.innerText=Bt;
-
-        // $(document).ready(function(){
-        //     $("#tittle").text(Bt);
-        // });
-
     }
-
-
 
     // 2.1生成问题
     function columnNameF(columnName,isSelect) {
