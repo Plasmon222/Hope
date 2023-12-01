@@ -8,7 +8,6 @@ function getUrlParams() {
         var keyValue = keyValuePairs[i].split('=');
         params[decodeURIComponent(keyValue[0])] = decodeURIComponent(keyValue[1] || '');
     }
-
     return params;
 }
 
@@ -19,6 +18,7 @@ console.log(sruveyIdValue);
 
 
 console.log("1、调用ajax方法,获取数据。");
+
 var surveyId = sruveyIdValue;
 getFormat(sruveyIdValue);
 
@@ -26,37 +26,46 @@ getFormat(sruveyIdValue);
 function getFormat(surveyId) {
     console.log("surveyId=" + surveyId);
     $.ajax({
-        // url: "http://localhost:8080/test1",
-        url: "./getSurveyTemplate?surveyId="+surveyId,
+        url: "./getSurveyTemplate",
         type: "POST",
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify({"surveyId":surveyId}),
         success: function (response) {
-            //1.1 判断返回模版有效期是否有效
-            var gpTime=response.object.gpTime;
-
-            //判断的方法
-            function isTimeOver(targetTimeStr) {
-                var nowTime = new Date();
-                var targetTime = new Date(targetTimeStr);
-                return nowTime.getTime() > targetTime.getTime();
+            if(response.rtnCode==9999){
+                alert("错误信息："+response.error);
             }
-            if (isTimeOver(gpTime)) {
-                console.log("当前时间已经超过截止时间,跳转错误页面");
-                window.location.replace("index.html");
-                // window.location ="teamTask2.html?rtnMsg="+encodeURIComponent("问卷调查已结束");
-            } else {
-                console.log("当前时间未超过截止时间");
-                console.log("2、调用surveyTemplateTest方法，进行模版设置");
-                surveyTemplateTest(response);
-            }
+            pdtime(response);
         },
         error: function (xhr, status, error) {
             console.error("Error: " + error);
         }
     });
 }
+var surveyType;
+//1.1 校验：判断请求模版是否过期
+function pdtime(result){
+    //定义模版时间
+    var gpTime=result.object.gpTime;
+    //定义模版类型
+    surveyType=result.object.surveyType;
+
+    //判断的方法
+    function isTimeOver(targetTimeStr){
+        var nowTime =new Date();
+        var targetTime =new Date(targetTimeStr);
+        return nowTime.getTime() >=targetTime.getTime();
+    }
+    if (isTimeOver(gpTime)){
+        console.log("当前时间已超过截止时间，跳转错误页面");
+        window.location="index.html";
+    }else {
+        console.log("当前时间未超过截止时间");
+        console.log("调用surveyTemplateTest方法，进行模版设置");
+        surveyTemplateTest(result);
+    }
+}
+
 
 // 2、调用surveyTemplateTest方法，进行模版设置
 function surveyTemplateTest(result) {
@@ -68,8 +77,6 @@ function surveyTemplateTest(result) {
      boxDate:输入框内容
      columnName:问题
      */
-    // console.log(result.beans);
-
     // 2.0.0 进行标题的设置
     function setTittle(Bt){
         var tittle1 = document.getElementById("tittle");
@@ -91,13 +98,12 @@ function surveyTemplateTest(result) {
 
     // 2.2输入框类型选择
     function boxTypeF(boxType, boxDate, isSelect, columnTag,notesData) {
-        console.log(columnTag+"---isSelect="+isSelect)
+        // console.log(columnTag+"---isSelect="+isSelect)
         // 向city中添加输入框
         var city = document.getElementById("city");
         //boxType:输入框类型 0输入框 1单选框 2复选框
         if (boxType == 1) {
             let arr = boxDate.split("；"); // 以逗号为分隔符截取字符串
-            //console.log(arr); // 输出 ["apple", "banana", "orange"]
             //创建一个li (开口
             let li = document.createElement("li");
             city.innerHTML += "<li>";
@@ -186,17 +192,15 @@ submitButton.addEventListener('click',function (event){
         if(input.value.trim() ===''){
             staffNo("请填写必填项");
             // alert('请填写必填项');
-
             return;
         }
     }
     //如果所有必填项已填写，则执行后面的代码
-
-
-
     // form.submit();
     getFormData();
 });
+
+
 // 3、获得form表单内的数据
 function getFormData() {
     var form = document.getElementById("myForm");
@@ -242,7 +246,7 @@ function getFormData() {
     let phoneNum = inputs[0].value;
     if (isPhoneNumberValid(phoneNum)) {
         console.log("验证手机号成功===" + phoneNum)
-        // 4、发送form表单数据给新建接口
+        // 4、发送form表单数据给保存接口
         saveData(surveyId,columnContent,ColumnTag,phoneNum);
     } else {
         // alert("手机号码格式错误：" + phoneNum);
@@ -256,10 +260,72 @@ function submitClick(){
 
 // 4、发送form表单数据给新建接口
 function saveData(surveyId,columnContent,columnTag,phoneNum) {
-    console.log("准备发送的数据===" + JSON.stringify({"surveyId":surveyId,
+    console.log("准备发送的数据===" + JSON.stringify(
+        {"surveyId":surveyId,
         "columnContent":columnContent,
         "ColumnTag":columnTag,
         "phoneNum":phoneNum}))
+    //!4.1、校验查询电话号是否在三个月内在调研名单接口
+    isExistSurveyType(phoneNum,surveyType);
+    function isExistSurveyType(phoneNum,surveyType){
+        $.ajax({
+            url: "./isExistSurveyType",
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                "phoneNum":phoneNum,
+                "surveyType":surveyType
+            }),
+            success: function (response) {
+                console.log("4.1、用户在调研名单中");
+                // staffNo("数据保存成功")
+                // window.location="index.html"
+                var isExist=response.object.isExist;
+                if(isExist==0){
+                    //继续执行
+                }else {
+                    //跳出网页报错
+                    window.location="index.html"
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error: " + error);
+            }
+        });
+    }
+    //!4.2、校验查询电话号是否在三个月内是否已经填写接口
+    isWriteSurveyType(phoneNum,surveyId);
+    function isWriteSurveyType(phoneNum,surveyId){
+        $.ajax({
+            url: "./isWriteSurveyType",
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                "phoneNum":phoneNum,
+                "surveyId":surveyId
+            }),
+            success: function (response) {
+                console.log("4.2、校验查询电话号是否在三个月内是否已经填写接口调用成功");
+                // window.location="index.html"
+                var isWrite=response.object.isWrite;
+                if(isWrite==0){
+                    //继续执行
+
+                }else {
+                    //跳出网页报错
+                    window.location="index.html"
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error: " + error);
+            }
+        });
+    }
+
+
+    //保存接口
     $.ajax({
         url: "http://localhost:8080/saveSurveyTemplateData",
         type: "POST",
@@ -271,22 +337,16 @@ function saveData(surveyId,columnContent,columnTag,phoneNum) {
             "ColumnTag":columnTag,
             "phoneNum":phoneNum
         }),
-        // data: surveyId,
         success: function (response) {
             console.log("5、数据保存成功");
-            console.log(response);
-            // alert("数据保存成功");
             staffNo("数据保存成功")
-            window.location="index.html"
+            // window.location="index.html"
         },
         error: function (xhr, status, error) {
             window.location="index.html"
             console.error("Error: " + error);
         }
-
-    }
-
-    );
+    });
 }
 
 //设置遮罩层
